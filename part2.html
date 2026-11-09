@@ -965,6 +965,17 @@ body.sxon #hint{opacity:0;pointer-events:none}
 .sx.full .sx-stage{width:1216px;height:912px}
 .sx.full .sx-lower{display:none}
 .sx.full .sx-sbar{width:1216px}
+
+/* شريحة رابط تفتح صفحة أخرى (type: 'link') */
+.lk{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 30%,#F3EEFF,#E4DAFF 70%)}
+.lk-card{background:#fff;border-radius:48px;box-shadow:0 30px 80px rgba(133,92,214,.25);padding:70px 90px;display:flex;align-items:center;gap:80px;max-width:1500px}
+.lk-ic{width:330px;height:330px;flex:none;border-radius:50%;background:linear-gradient(135deg,#855CD6,#B48CFF);display:grid;place-items:center;font-size:190px;box-shadow:0 20px 50px rgba(133,92,214,.35);animation:lkb 2.4s ease-in-out infinite}
+@keyframes lkb{50%{transform:translateY(-18px) rotate(-4deg)}}
+.lk-t .chip{margin-bottom:20px}
+.lk-t h2{font-family:var(--head);font-size:84px;font-weight:800;line-height:1.2;margin:0 0 18px;color:#2A1F5C}
+.lk-t p{font-size:36px;font-weight:600;line-height:1.6;color:#4A4170;margin:0 0 40px;max-width:820px}
+.lk-t .btn.big{font-size:40px;padding:26px 56px}
+.lk-t small{display:block;margin-top:22px;font-size:24px;color:#8A80B4;font-weight:700}
 </style>
 </head>
 <body>
@@ -1273,26 +1284,14 @@ const SLIDES = [
     ]
   },
 
-  /* 20) 🐱 محاكي سكراتش: اسحبي اللبنات من اللوحة إلى مساحة العمل ثم اضغطي العلم الأخضر
-     start: 'empty' تبدأ المساحة فارغة • 'example' يظهر المثال الجاهز مباشرة
-     example: البرنامج الجاهز (يظهر بزر «✨ مثال جاهز») */
+  /* 20) 🐱 محاكي سكراتش: يُفتح في صفحة مستقلة (scratch.html بجانب هذا الملف) */
   {
-    type: 'scratch', fx: 'fade',
-    project: 'صباح الخير أم مساء الخير؟',
-    task: 'ابني برنامج الساعة: تسأل القطة «كم الساعة؟»، فإذا كانت الإجابة <b>أصغر من 12</b> تقول «صباح الخير ☀️»، وإلا تقول «مساء الخير 🌙».',
-    hints: ['🟡 الأحداث: «عند نقر العلم»', '🔵 الاستشعار: «اسأل ( ) وانتظر»', '🟠 التحكم: «إذا ( ) ثم وإلا»', '🟢 المعاملات: «( ) < ( )» ثم ضعي داخلها «الإجابة»', '🏁 اضغطي العلم الأخضر وجرّبي: 9 ثم 15'],
-    start: 'empty',
-    example: [
-      { blocks: [
-        { op: 'flag' },
-        { op: 'bd', in: ['خلفية بيضاء'] },
-        { op: 'ask', in: ['كم الساعة؟'] },
-        { op: 'ifelse', in: [{ op: 'lt', in: [{ op: 'answer' }, '12'] }], m: [
-          [{ op: 'bd', in: ['نهار'] }, { op: 'sayFor', in: ['صباح الخير أيها العالم ☀️', '2'] }],
-          [{ op: 'bd', in: ['ليل'] }, { op: 'sayFor', in: ['مساء الخير أيها العالم 🌙', '2'] }]
-        ] }
-      ] }
-    ]
+    type: 'link', fx: 'zoom', icon: '🐱', chip: 'وقت التطبيق 💻', cat: 'events',
+    title: 'هيا نبرمج في سكراتش!',
+    text: 'افتحي محاكي سكراتش، واسحبي اللبنات لتبني برنامج الساعة: صباح الخير ☀️ أم مساء الخير 🌙؟',
+    button: '🐱 افتحي محاكي سكراتش',
+    href: 'scratch.html',
+    note: 'يُفتح في تبويب جديد • ارجعي إلى العرض من تبويب الدرس'
   },
 
   /* 21) ✨ شرح: تشريح لبنة إذا ( ) ثم وإلا */
@@ -2482,6 +2481,7 @@ RENDER.scratch = (s, root) => {
       <button class="sx-mi tk">🎯 المهمة</button>
       <button class="sx-mi ex">✨ مثال جاهز</button>
       <button class="sx-mi clr">🧹 مسح</button>
+      ${s.fullBtn ? '<button class="sx-mi fsb">⛶ ملء الشاشة</button>' : ''}
     </div>
     <div class="sx-body">
       <div class="sx-ed">
@@ -2725,6 +2725,8 @@ RENDER.scratch = (s, root) => {
   const hats = op => [...cv.children].filter(st => st.firstElementChild && st.firstElementChild.dataset.op === op);
   $q('.sx-go').onclick = () => { Sound.click(); stopAll(); hats('flag').forEach(st => start(st, true)); };
   $q('.sx-stop').onclick = () => stopAll();
+  const fsb = $q('.sx-mi.fsb');
+  if (fsb) fsb.onclick = () => { if (!document.fullscreenElement) (document.documentElement.requestFullscreen || function(){}).call(document.documentElement); else document.exitFullscreen && document.exitFullscreen(); };
 
   /* ---------- القوائم والأزرار العلوية ---------- */
   const fileMi = $q('.sx-mi.file');
@@ -2912,6 +2914,20 @@ RENDER.scratch = (s, root) => {
   };
   root._leave = () => { document.body.classList.remove('sxon'); stopAll(); sx.classList.remove('full'); };
   draw();
+};
+
+/* شريحة رابط: زر يفتح صفحة أخرى (مثل محاكي سكراتش scratch.html) في تبويب جديد */
+RENDER.link = (s, root) => {
+  root.innerHTML = `<div class="lk"><div class="lk-card">
+    <div class="lk-ic st">${s.icon || '🐱'}</div>
+    <div class="lk-t">
+      ${s.chip ? `<span class="chip blk b-${s.cat || 'looks'} st">${s.chip}</span>` : ''}
+      <h2 class="st">${s.title}</h2>
+      <p class="st">${s.text}</p>
+      <button class="btn big green go st">${s.button}</button>
+      ${s.note ? `<small class="st">${s.note}</small>` : ''}
+    </div></div></div>`;
+  root.querySelector('.go').onclick = () => { Sound.click(); window.open(s.href, '_blank'); };
 };
 
 /* الشريحة الختامية */
