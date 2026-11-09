@@ -197,21 +197,33 @@ mark{background:linear-gradient(transparent 55%,#FFE08A 55%);color:inherit;paddi
 .scr-stg .stg-sp .sp{font-size:110px}
 .scr-stg .bub{font-size:22px;white-space:normal;width:250px;text-align:center}
 
-/* ---------- النشيد الوطني ---------- */
-.anth{display:flex;gap:70px;align-items:center;height:100%}
-.flagw{flex:0 0 640px;display:flex;flex-direction:column;align-items:center;gap:26px}
-.sflag{position:relative;width:600px;height:400px;background:#006C35;border-radius:8px;box-shadow:0 30px 60px rgba(0,60,30,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;transform-origin:left center;overflow:hidden}
-.slide.active .sflag{animation:wave 5s ease-in-out infinite}
-@keyframes wave{50%{transform:perspective(900px) rotateY(-7deg) skewY(-1.5deg)}}
-.sflag::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.18) 40%,transparent 55%,rgba(0,0,0,.12) 75%,transparent);background-size:200% 100%;animation:shine 5s linear infinite}
-@keyframes shine{to{background-position:-200% 0}}
-.sflag .shd{font-family:var(--head);font-size:52px;font-weight:800;line-height:1.3;text-align:center}
-.sflag svg{width:380px;height:60px}
-.pole{width:600px;font-size:28px;font-weight:800;color:var(--muted);text-align:center}
-.lyr{flex:1;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.ly{font-family:var(--head);font-size:38px;font-weight:700;padding:4px 24px;border-radius:18px;transition:.5s;color:#54608A}
-.ly.on{background:#E3F5EA;color:#006C35;transform:scale(1.04);box-shadow:inset 6px 0 0 #006C35}
-.anth-tools{display:flex;gap:14px;align-items:center;margin-top:10px}
+/* ---------- النشيد الوطني: العلم يملأ الشاشة ---------- */
+.anth2{position:absolute;inset:0;z-index:1;overflow:hidden;background:linear-gradient(160deg,#1B8DE0,#7FC4F5)}
+.anth2 .fl-img{position:absolute;inset:-4%;background-size:cover;background-position:center 40%;transform-origin:30% 50%}
+.slide.active .anth2 .fl-img{animation:kb 22s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1) translate(0,0)}to{transform:scale(1.12) translate(-1.5%,-1%)}}
+.anth2 .fl-shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);background-size:250% 100%;mix-blend-mode:soft-light}
+.slide.active .anth2 .fl-shine{animation:shine 7s linear infinite}
+@keyframes shine{to{background-position:-250% 0}}
+.anth2 .fl-shade{position:absolute;inset:0;background:linear-gradient(270deg,rgba(0,58,30,.86) 0%,rgba(0,58,30,.55) 32%,transparent 58%),linear-gradient(0deg,rgba(0,40,20,.45),transparent 30%)}
+.anth2 .fl-panel{position:absolute;top:0;bottom:0;right:110px;width:640px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:28px;color:#fff}
+.fl-chip{font-size:26px;font-weight:800;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.45);backdrop-filter:blur(6px);border-radius:999px;padding:8px 24px}
+.fl-panel h1{font-family:var(--head);font-size:112px;font-weight:800;line-height:1.1;text-shadow:0 6px 24px rgba(0,0,0,.35)}
+.fl-panel h1 small{display:block;font-size:52px;opacity:.92}
+.fl-stand{display:flex;align-items:center;gap:16px;font-size:34px;font-weight:800;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.35);border-radius:24px;padding:14px 26px}
+.fl-stand span{font-size:54px}
+.slide.active .fl-stand span{animation:bob 2.6s ease-in-out infinite}
+.fl-tools{display:flex;gap:16px;align-items:center}
+.fl-tools .btn.go{background:#fff;color:#006C35;box-shadow:0 8px 0 rgba(0,0,0,.25);font-size:36px;padding:20px 44px}
+.fl-tools .btn.stop{background:rgba(255,255,255,.18);color:#fff;box-shadow:inset 0 0 0 3px rgba(255,255,255,.5)}
+.fl-bar{width:100%;height:12px;border-radius:12px;background:rgba(255,255,255,.25);overflow:hidden}
+.fl-bar i{display:block;height:100%;width:0;background:#fff;border-radius:12px;transition:width .3s linear}
+.fl-eq{display:flex;gap:7px;align-items:flex-end;height:46px;opacity:0;transition:.4s}
+.fl-eq i{width:10px;height:12px;border-radius:6px;background:#fff}
+.anth2.playing .fl-eq{opacity:1}
+.anth2.playing .fl-eq i{animation:wv .8s ease-in-out infinite}
+.fl-eq i:nth-child(2n){animation-delay:.2s!important}.fl-eq i:nth-child(3n){animation-delay:.35s!important}
+.anth2 ~ .deco{display:none}
 
 /* ---------- دعاء الصباح ---------- */
 .dua{display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center}
@@ -913,11 +925,13 @@ const SLIDES = [
     ]
   },
 
-  /* 2) النشيد الوطني */
+  /* 2) النشيد الوطني — صورة العلم flag.jpg بجانب index.html */
   {
-    type: 'anthem', fx: 'fade', title: 'النشيد الوطني 🇸🇦', strategy: 'نبدأ يومنا بحب الوطن', cat: 'pen',
-    lines: ['سارعي للمجد والعلياء', 'مجّدي لخالق السماء', 'وارفعي الخفّاق أخضر', 'يحمل النور المسطّر', 'ردّدي الله أكبر', 'يا موطني', 'موطني عشتَ فخرَ المسلمين', 'عاش المليك للعلَم والوطن'],
-    note: '🧍‍♀️ نقف احتراماً للنشيد الوطني'
+    type: 'anthem', fx: 'fade',
+    chip: 'نبدأ يومنا بحب الوطن 💚',
+    title: 'النشيد الوطني<small>المملكة العربية السعودية 🇸🇦</small>',
+    image: 'flag.jpg',
+    note: 'نقف احتراماً للنشيد الوطني'
   },
 
   /* 3) دعاء الصباح */
@@ -1619,43 +1633,34 @@ RENDER.title = (s, root) => {
   root._leave = () => tms.forEach(clearTimeout);
 };
 
-/* 2) النشيد الوطني */
+/* 2) النشيد الوطني: صورة العلم تملأ الشاشة + تشغيل الصوت */
 RENDER.anthem = (s, root) => {
-  root.innerHTML = shell(s, `<div class="anth">
-    <div class="flagw st">
-      <div class="sflag"><div class="shd">لا إله إلا الله<br>محمد رسول الله</div>
-        <svg viewBox="0 0 380 60"><path d="M30 34 H330 L360 30 L330 26 H40 Z" fill="#fff"/><rect x="18" y="20" width="14" height="24" rx="3" fill="#fff"/><path d="M8 32 q-6 -10 6 -14" stroke="#fff" stroke-width="5" fill="none"/></svg>
-      </div>
-      <p class="pole">${s.note}</p>
-    </div>
-    <div class="lyr st">${s.lines.map(l => `<button class="ly">${l}</button>`).join('')}
-      <div class="anth-tools"><button class="btn green go">▶ ابدئي النشيد</button><button class="btn ghost sm stop">⏹ إيقاف</button></div>
-    </div>
-  </div>`);
-  const ls = [...root.querySelectorAll('.ly')];
-  let iv = null, k = 0, audio = null;
-  const mark = i => ls.forEach((l, j) => l.classList.toggle('on', j === i));
-  const stop = () => { clearInterval(iv); iv = null; if (audio){ audio.pause(); } };
+  root.innerHTML = `<div class="anth2">
+    <div class="fl-img" style="background-image:url('${s.image}')"></div><div class="fl-shine"></div><div class="fl-shade"></div>
+    <div class="fl-panel">
+      <span class="fl-chip st">${s.chip}</span>
+      <h1 class="st">${s.title}</h1>
+      <div class="fl-stand st"><span>🧍‍♀️</span>${s.note}</div>
+      <div class="fl-tools st"><button class="btn go">▶ ابدئي النشيد</button><button class="btn sm stop">⏹ إيقاف</button><div class="fl-eq">${'<i></i>'.repeat(7)}</div></div>
+      <div class="fl-bar st"><i></i></div>
+    </div></div>`;
+  const wrap = root.querySelector('.anth2'), bar = root.querySelector('.fl-bar i');
+  let audio = null;
+  const stop = () => { if (audio){ audio.pause(); } wrap.classList.remove('playing'); };
   root.querySelector('.go').onclick = () => {
-    stop(); k = 0; mark(0);
-    let played = false;
-    if (LESSON.anthemAudio){
-      try {
-        if (!audio){
-          audio = new Audio(LESSON.anthemAudio);
-          /* تظليل الأبيات حسب وقت التشغيل الفعلي حتى تتزامن مع الصوت */
-          audio.addEventListener('timeupdate', () => { if (audio.duration) mark(Math.min(ls.length - 1, Math.floor(audio.currentTime / audio.duration * ls.length))); });
-          audio.addEventListener('ended', () => mark(-1));
-        }
-        audio.currentTime = 0;
-        const pr = audio.play(); played = true;
-        if (pr && pr.catch) pr.catch(() => { iv = setInterval(() => { k++; if (k >= ls.length){ stop(); return; } mark(k); }, 3600); });
-      } catch (e) { played = false; }
-    }
-    if (!played){ Sound.bell(); iv = setInterval(() => { k++; if (k >= ls.length){ stop(); return; } mark(k); }, 3600); }
+    if (!LESSON.anthemAudio){ Sound.bell(); return; }
+    try {
+      if (!audio){
+        audio = new Audio(LESSON.anthemAudio);
+        audio.addEventListener('timeupdate', () => { if (audio.duration) bar.style.width = (audio.currentTime / audio.duration * 100) + '%'; });
+        audio.addEventListener('ended', () => { wrap.classList.remove('playing'); bar.style.width = '100%'; });
+      }
+      audio.currentTime = 0; bar.style.width = '0';
+      const pr = audio.play(); wrap.classList.add('playing');
+      if (pr && pr.catch) pr.catch(() => wrap.classList.remove('playing'));
+    } catch (e) {}
   };
-  root.querySelector('.stop').onclick = () => { stop(); mark(-1); };
-  ls.forEach((l, i) => l.onclick = () => { mark(i); Sound.click(); });
+  root.querySelector('.stop').onclick = () => { stop(); if (audio) audio.currentTime = 0; bar.style.width = '0'; };
   root._leave = stop;
 };
 
