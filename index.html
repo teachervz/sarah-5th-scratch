@@ -886,7 +886,7 @@ const HI = (n, h) => `<span class="sv" data-h="${n}">${h}</span>`;
 const LESSON = {
   title: 'المعاملات الشرطية',
   /* لتشغيل النشيد الوطني بالصوت: ضعي ملف الصوت بجانب index.html واكتبي اسمه هنا، مثال: 'anthem.mp3' */
-  anthemAudio: '',
+  anthemAudio: 'anthem.m4a',
   messages: {
     correct: 'أحسنتِ! 👏 إجابة صحيحة',
     wrong:   'حاولي مرة أخرى 💜'
@@ -1638,9 +1638,21 @@ RENDER.anthem = (s, root) => {
   const stop = () => { clearInterval(iv); iv = null; if (audio){ audio.pause(); } };
   root.querySelector('.go').onclick = () => {
     stop(); k = 0; mark(0);
-    if (LESSON.anthemAudio){ try { audio = audio || new Audio(LESSON.anthemAudio); audio.currentTime = 0; audio.play(); } catch (e) {} }
-    else Sound.bell();
-    iv = setInterval(() => { k++; if (k >= ls.length){ stop(); return; } mark(k); }, 3600);
+    let played = false;
+    if (LESSON.anthemAudio){
+      try {
+        if (!audio){
+          audio = new Audio(LESSON.anthemAudio);
+          /* تظليل الأبيات حسب وقت التشغيل الفعلي حتى تتزامن مع الصوت */
+          audio.addEventListener('timeupdate', () => { if (audio.duration) mark(Math.min(ls.length - 1, Math.floor(audio.currentTime / audio.duration * ls.length))); });
+          audio.addEventListener('ended', () => mark(-1));
+        }
+        audio.currentTime = 0;
+        const pr = audio.play(); played = true;
+        if (pr && pr.catch) pr.catch(() => { iv = setInterval(() => { k++; if (k >= ls.length){ stop(); return; } mark(k); }, 3600); });
+      } catch (e) { played = false; }
+    }
+    if (!played){ Sound.bell(); iv = setInterval(() => { k++; if (k >= ls.length){ stop(); return; } mark(k); }, 3600); }
   };
   root.querySelector('.stop').onclick = () => { stop(); mark(-1); };
   ls.forEach((l, i) => l.onclick = () => { mark(i); Sound.click(); });
