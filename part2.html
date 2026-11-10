@@ -1692,16 +1692,21 @@ function makeTimer(seconds){
 }
 
 /* ربط أزرار الاختيار من متعدد */
+/* 🏆 نقاط المنافسة بين المجموعات: تُحتسب أول محاولة لكل سؤال فقط (تُفعَّل من sync.js) */
+let award = (ok, key) => {};
+
 function bindChoices(opts, correct, fb, onOk){
   let done = false;
+  const qkey = 'c:' + opts.map(o => o.textContent.trim()).join('|');
   const mark = () => { opts[correct].classList.add('correct'); opts.forEach((o, i) => i !== correct && o.classList.add('dim')); };
   opts.forEach((b, i) => b.addEventListener('click', () => {
     if (done) return;
+    award(i === correct, qkey);
     if (i === correct){ done = true; mark(); feedback(fb, true); Sound.success(); confettiAt(b); onOk && onOk(); }
     else { b.classList.add('wrong'); shake(b); feedback(fb, false); Sound.error(); }
   }));
   return {
-    reveal(){ done = true; mark(); onOk && onOk(); },
+    reveal(){ award(null, qkey); done = true; mark(); onOk && onOk(); },
     reset(){ done = false; opts.forEach(o => o.classList.remove('correct', 'wrong', 'dim')); clearFb(fb); }
   };
 }
@@ -1808,6 +1813,7 @@ RENDER.quiz = (s, root) => {
     oEl.innerHTML = Q[n].options.map(o => `<button class="opt">${o}</button>`).join('');
     [...oEl.children].forEach((b, k) => b.onclick = () => {
       if (solved) return;
+      award(k === Q[n].answer, 'q:' + Q[n].q);
       if (k === Q[n].answer){
         solved = true; first[n] = !tried; b.classList.add('correct'); [...oEl.children].forEach(o => o !== b && o.classList.add('dim'));
         feedback(fb, true); Sound.success(); confettiAt(b); say(stg, 'أحسنتِ! 👏'); hop(stg);
@@ -2152,6 +2158,7 @@ RENDER.fixcode = (s, root) => {
     if (done) return; const t = T[i], o = b.dataset.o, q = pc.querySelector('.opq'), hx = pc.querySelector('.slotdrop'), stg = stw.querySelector('.stg');
     q.textContent = o; hx.classList.remove('snap'); void hx.offsetWidth; hx.classList.add('snap'); Sound.snap();
     await wait(450);
+    award(o === t.answer, 'f:' + i + ':' + t.goal);
     if (o === t.answer){
       done = true; hx.classList.remove('slotdrop'); hl(root, 1); say(stg, t.say); hop(stg); Sound.success(); confettiAt(hx);
       feedback(fb, true, `صحيح! <span class="ltr">${t.test} ${o} ${t.value}</span> ← صح ✔`);
@@ -2191,6 +2198,7 @@ RENDER.math = (s, root) => {
   const truth = () => a > b ? '>' : a < b ? '<' : '=';
   btns.forEach(x => x.onclick = () => {
     if (lock || r >= s.rounds) return;
+    award(x.dataset.o === truth(), 'm:' + r);
     if (x.dataset.o === truth()){
       lock = true; bx.textContent = x.dataset.o; bx.classList.add('ok'); if (!tried) score++; sc.textContent = score;
       feedback(fb, true, `<span class="ltr">${a} ${x.dataset.o} ${b}</span> ← صح ✔`); Sound.ding(); pop(bx);
@@ -2347,6 +2355,8 @@ RENDER.tf = (s, root) => {
   rows.forEach((row, i) => {
     const ans = s.items[i].answer;
     row.querySelectorAll('.tfb').forEach(b => b.onclick = () => {
+      if (row.classList.contains('done')) return;
+      award((b.classList.contains('yes')) === ans, 't:' + i);
       if ((b.classList.contains('yes')) === ans){
         row.classList.add('done'); b.classList.add('on'); confettiAt(b);
         if (rows.every(r => r.classList.contains('done'))){ feedback(fb, true, 'رائع! أجبتِ عن جميع العبارات 🎉'); Sound.success(); }
@@ -2390,7 +2400,7 @@ RENDER.challenge = (s, root) => {
     oEl.innerHTML = q.options.map(o => `<button class="ch-o">${o}</button>`).join('');
     [...oEl.children].forEach((b, k) => b.onclick = () => {
       if (lock || !playing) return; lock = true;
-      const ok = k === q.answer;
+      const ok = k === q.answer; award(ok, 'h:' + q.q);
       if (ok){ score++; b.classList.add('ok'); Sound.ding(); } else { b.classList.add('bad'); oEl.children[q.answer].classList.add('ok'); Sound.error(); }
       paint(); setTimeout(() => { i++; ask(); }, ok ? 600 : 1100);
     });
@@ -3197,5 +3207,7 @@ const startAt = parseInt(location.hash.slice(1), 10) - 1;
 go(startAt >= 0 && startAt < els.length ? startAt : 0);
 wake();
 </script>
+<!-- العرض التزامني مع المعلمة (Firebase) — الإعدادات داخل sync.js -->
+<script src="sync.js"></script>
 </body>
 </html>

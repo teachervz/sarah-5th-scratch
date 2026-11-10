@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "sessions": {
+      "$sid": {
+        "$deck": {
+          "state": {
+            ".read": true,
+            ".write": "auth != null && auth.token.email == 'TEACHER_EMAIL@example.com'"
+          },
+          "score": {
+            ".read": true,
+            ".write": "auth != null && auth.token.email == 'TEACHER_EMAIL@example.com'",
+            "$team": {
+              ".write": "newData.isNumber() && newData.val() - (data.exists() ? data.val() : 0) >= 0 && newData.val() - (data.exists() ? data.val() : 0) <= 10",
+              ".validate": "newData.isNumber()"
+            }
+          },
+          "viewers": {
+            ".read": "auth != null && auth.token.email == 'TEACHER_EMAIL@example.com'",
+            "$vid": {
+              ".write": true,
+              ".validate": "!newData.exists() || newData.isNumber() || newData.hasChildren(['t'])"
+            }
+          }
+        }
+      }
+    }
+  }
+}
